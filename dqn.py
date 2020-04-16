@@ -75,7 +75,8 @@ def train(q, q_target, memory, optimizer):
         optimizer.step()
 
 def main():
-    env = gym.make('CartPole-v1')
+    #env = gym.make('CartPole-v1')
+    env = gym.make('MsPacman-v0')
     q = Qnet()
     q_target = Qnet()
     q_target.load_state_dict(q.state_dict())
