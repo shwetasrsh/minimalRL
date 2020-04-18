@@ -7,12 +7,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+# An effective way to monitor and analyze an agent’s success during training is to chart its cumulative reward at the end of 
+# each episode.
+
 #Hyperparameters
 learning_rate = 0.0005
 gamma         = 0.98
 buffer_limit  = 50000
 batch_size    = 32
 
+
+# this buffer is a dataset of our agent's past experiences
+# this ensures that the agent is learning from its entire history
 class ReplayBuffer():
     def __init__(self):
         self.buffer = collections.deque(maxlen=buffer_limit)
@@ -77,6 +83,8 @@ def train(q, q_target, memory, optimizer):
 def main():
     #env = gym.make('CartPole-v1')
     env = gym.make('MsPacman-v0')
+    #use env = gym.make('MsPacman-No-Frameskip-v0')
+    #and then on this apply the opitcal flow
     q = Qnet()
     q_target = Qnet()
     q_target.load_state_dict(q.state_dict())
@@ -89,11 +97,18 @@ def main():
     for n_epi in range(10000):
         epsilon = max(0.01, 0.08 - 0.01*(n_epi/200)) #Linear annealing from 8% to 1%
         s = env.reset()
+        # reset function returns an initial observation
         done = False
 
         while not done:
             a = q.sample_action(torch.from_numpy(s).float(), epsilon)      
             s_prime, r, done, info = env.step(a)
+            # s_prime => an environment specific object representing your observation of the environment
+            # r => amount of reward achieved by the previous action. The scale varies between environments, but the goal is
+            # always to increase your total reward
+            # done => whether its time to reset the environment again. Most tasks are divided up into well defined episodes 
+            # and done being true indicates the episode has terminated.
+            # info => diagnostic information useful for debugging. 
             done_mask = 0.0 if done else 1.0
             memory.put((s,a,r/100.0,s_prime, done_mask))
             s = s_prime
