@@ -86,8 +86,18 @@ def main():
     #use env = gym.make('MsPacman-No-Frameskip-v0')
     #and then on this apply the opitcal flow
     q = Qnet()
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # model = Qnet().to(device)
     q_target = Qnet()
+    # here q_target and q are new instance objects of the class Qnet
     q_target.load_state_dict(q.state_dict())
+    # state_dict() => In pytorch, the learnable parameters(i.e. weights and biases) of a model are contained in the model.param-
+    # eters(). A state_dict is simply a python dictionary object that maps each layer to its parameter tensor. Only layers with
+    # learnable parameters(convolutional layers, linear layers etc) and registered buffers(batchnorm's running mean) have entries
+    # in the state_dict.
+    # When saving a model for inference, it is only necessary to save the trained model's learned parameters.
+    # A commmon pytorch convention is to save models using either .pt or .pth file extension.
+    # load_state_dict => loads the model's parameters
     memory = ReplayBuffer()
 
     print_interval = 20
@@ -101,8 +111,9 @@ def main():
         done = False
 
         while not done:
-            a = q.sample_action(torch.from_numpy(s).float(), epsilon)      
+            a = q.sample_action(torch.from_numpy(s).float(), epsilon)          
             s_prime, r, done, info = env.step(a)
+            # this step => gives new state and reward from the environment by applying the action
             # s_prime => an environment specific object representing your observation of the environment
             # r => amount of reward achieved by the previous action. The scale varies between environments, but the goal is
             # always to increase your total reward
