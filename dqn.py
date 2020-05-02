@@ -11,10 +11,17 @@ import torch.optim as optim
 # each episode.
 
 #Hyperparameters
-learning_rate = 0.0005
+#learning_rate = 0.0005
+#gamma         = 0.98
+#buffer_limit  = 50000
+#batch_size    = 32
+
+
+#Hyperparameters from open ai gym
+learning_rate = 0.001
 gamma         = 0.98
 buffer_limit  = 50000
-batch_size    = 32
+batch_size    = 128
 
 
 # this buffer is a dataset of our agent's past experiences
@@ -108,12 +115,14 @@ def main():
     for n_epi in range(10000):
         epsilon = max(0.01, 0.08 - 0.01*(n_epi/200)) #Linear annealing from 8% to 1%
         s = env.reset()
+        # reset() function resets and returns the starting frame
         # reset function returns an initial observation
         done = False
 
         while not done:
             a = q.sample_action(torch.from_numpy(s).float(), epsilon)          
             s_prime, r, done, info = env.step(a)
+            # this line performs a random action, returns the new frame,reward and whether the game is over.
             # this step => gives new state and reward from the environment by applying the action
             # s_prime => an environment specific object representing your observation of the environment
             # r => amount of reward achieved by the previous action. The scale varies between environments, but the goal is
