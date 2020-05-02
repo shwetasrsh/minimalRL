@@ -56,6 +56,7 @@ class Qnet(nn.Module):
     def __init__(self):
         super(Qnet, self).__init__()
         self.fc1 = nn.Linear(4, 128)
+        #Here 4 because each state representation is an input and that takes 4 preprocessed image frames
         self.fc2 = nn.Linear(128, 128)
         self.fc3 = nn.Linear(128, 2)
 
@@ -76,7 +77,7 @@ class Qnet(nn.Module):
 def train(q, q_target, memory, optimizer):
     for i in range(10):
         s,a,r,s_prime,done_mask = memory.sample(batch_size)
-
+        
         q_out = q(s)
         q_a = q_out.gather(1,a)
         max_q_prime = q_target(s_prime).max(1)[0].unsqueeze(1)
@@ -140,7 +141,9 @@ def main():
             
         if memory.size()>2000:
             train(q, q_target, memory, optimizer)
-
+        
+        #from here we will begin the LTH
+        
         if n_epi%print_interval==0 and n_epi!=0:
             q_target.load_state_dict(q.state_dict())
             print("n_episode :{}, score : {:.1f}, n_buffer : {}, eps : {:.1f}%".format(
