@@ -79,7 +79,9 @@ def train(q, q_target, memory, optimizer):
         s,a,r,s_prime,done_mask = memory.sample(batch_size)
         
         q_out = q(s)
+        
         q_a = q_out.gather(1,a)
+        
         max_q_prime = q_target(s_prime).max(1)[0].unsqueeze(1)
         target = r + gamma * max_q_prime * done_mask
         loss = F.smooth_l1_loss(q_a, target)
@@ -143,7 +145,7 @@ def main():
             train(q, q_target, memory, optimizer)
         
         #from here we will begin the LTH
-        
+        # q_target.load_state_dict(q.state_dict())
         if n_epi%print_interval==0 and n_epi!=0:
             q_target.load_state_dict(q.state_dict())
             print("n_episode :{}, score : {:.1f}, n_buffer : {}, eps : {:.1f}%".format(
