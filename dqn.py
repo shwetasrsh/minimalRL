@@ -93,7 +93,7 @@ def train(q, q_target, memory, optimizer):
 def main():
     #env = gym.make('CartPole-v1')
     #env = gym.make('MsPacman-v0')
-    env = gym.make('MsPacman-No-Frameskip-v0')
+    env = gym.make('MsPacman-v0')
     #use env = gym.make('MsPacman-No-Frameskip-v0')
     #and then on this apply the opitcal flow
     q = Qnet()
